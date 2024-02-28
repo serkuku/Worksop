@@ -1,4 +1,5 @@
 const Product = require('../Models/Product')
+const fs = require('fs')
 exports.read = async(req,res)=>{
     try{
         const id = req.params.id
@@ -27,9 +28,13 @@ exports.list = async(req,res)=>{
 
 exports.create = async(req,res)=>{
     try{
-        console.log(req.body);
-        const product = await Product(req.body).save()
+        var data = req.body        
+        if(req.file){
+            data.file = req.file.filename
+        }
+        const product = await Product(data).save()
         res.send(product)
+        console.log(product);
     }
     catch(err){
         console.log(err);
@@ -54,8 +59,19 @@ exports.update = async(req,res)=>{
 exports.remove = async(req,res)=>{
     try{
         const id = req.params.id
-        const product = await Product.findOneAndDelete({_id:id},req.body,{new:true}).exec()
-        res.send(product)
+        const removed = await Product.findOneAndDelete({_id:id},req.body,{new:true}).exec()
+        res.send(removed);
+        console.log(removed);
+        if(removed?.file){
+            await fs.unlink('./uploads/' + removed.file,(err)=>{
+            if(err){
+                console.log(err);
+            }else{
+                console.log('remove success');
+            }
+        })
+        }
+        
     }
     catch(err){
         console.log(err);

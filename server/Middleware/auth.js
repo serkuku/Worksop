@@ -7,7 +7,7 @@ exports.auth = async (req,res,next) =>{
         }
         const decoded = jwt.verify(token,'jwtsecret',)
         req.user = decoded.user
-        console.log(decoded);
+        //console.log(decoded);
         next()
     }catch(err){
         console.log(err);
